@@ -42,6 +42,7 @@ Section "InputClass"
         Option "FingerLow" "30"
         Option "FingerHigh" "50"
         Option "MaxTapTime" "125"
+        Option "VertScrollDelta" "-111"
 EndSection
 ```
 
