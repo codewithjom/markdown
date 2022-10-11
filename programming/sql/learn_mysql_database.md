@@ -522,3 +522,283 @@ To drop a `CHECK` constraint, use the following SQL:
 ```sql
 ALTER TABLE Persons DROP CHECK CHK_PersonAge;
 ```
+
+## :small_blue_diamond: MySQL DEFAULT
+
+### MySQL DEFAULT Constraint
+
+The `DEFAULT` constraint is used to set a default value for a column.
+
+The default value will be added to all new records, if no other value is specified.
+
+### DEFAULT on CREATE TABLE
+
+The following SQL sets a `DEFAULT` value for the "City" column when the "Persons" table is created:
+
+```sql
+CREATE TABLE Persons (
+  ID int NOT NULL,
+  LastName varchar(255) NOT NULL,
+  FirstName varchar(255),
+  Age int,
+  City varchar(255) DEFAULT 'Sandnes'
+);
+```
+
+The `DEFAULT` constraint can also be used to insert system values, by using functions like `CURRENT_DATE()`:
+
+```sql
+CREATE TABLE Orders (
+  ID int NOT NULL,
+  OrderNumber int NOT NULL,
+  OrderDate date DEFAULT CURRENT_DATE()
+);
+```
+
+### DEFAULT on ALTER TABLE
+
+To create a `DEFAULT` constraint on the "City" column when the table is already created, use the following SQL:
+
+```sql
+ALTER TABLE Persons ALTER City SET DEFAULT 'Sandnes';
+```
+
+### DROP a DEFAULT Constraint
+
+To drop a `DEFAULT` constraint, use the following SQL:
+
+```sql
+ALTER TABLE Persons ALTER City DROP DEFAULT;
+```
+
+## :small_blue_diamond: MySQL CREATE INDEX
+
+### MySQL CREATE INDEX Statement
+
+The `CREATE INDEX` statement is used to create indexes in tables.
+
+Indexes are used to retrieve data from the database more quickly than otherwise. The users cannot see the indexes, they are just used to speed up searches/queries.
+
+**NOTE**: Updating a table with indexes takes more time than updating a table without (because the indexes also need an update). So, only create indexes on columns that will be frequently searched against.
+
+**CREATE INDEX Syntax**
+
+```sql
+CREATE INDEX index_name on TABLE_name (column1, column2, ...);
+```
+
+**CREATE UNIQUE INDEX Syntax**
+
+```sql
+CREATE UNIQUE INDEX index_name ON table_name (column1, column2, ...);
+```
+
+### MySQL CREATE INDEX Example
+
+The SQL statement below creates an index named "idx_lastname" on the "LastName" column in the "Persons" table:
+
+```sql
+CREATE INDEX idx_lastname ON Persons (LastName);
+```
+
+If you want to create an index on a combination of columns, you can list the column names within the parentheses, separated by commas:
+
+```sql
+CREATE INDEX idx_pname ON Persons (LastName, FirstName);
+```
+
+### DROP INDEX Statement
+
+The `DROP INDEX` statement is used to delete an index in a table.
+
+```sql
+ALTER TABLE table_name DROP INDEX index_name;
+```
+
+## :small_blue_diamond: MySQL AUTO INCREMENT
+
+### What is an AUTO INCREMENT Field?
+
+Auto-increment allows a unique number to be generated automatically when a new record is inserted into a table.
+
+Often this is the primary key field that we would like to be created automatically every time a new record is inserted.
+
+### MySQL AUTO_INCREMENENT Keyword
+
+MySQL uses the `AUTO_INCREMENENT` keyword to perform an auto-increment feature.
+
+By default, the starting value for `AUTO_INCREMENENT` is 1, and it will incremented by 1 for each new record.
+
+The following SQL statement defines the "Personid" column to be auto-increment primary key field in the "Persons" table:
+
+```sql
+CREATE TABLE Persons (
+  Personid int NOT NULL AUTO_INCREMENENT,
+  LastName varchar(255) NOT NULL,
+  FirstName varchar(255),
+  Age int,
+  PRIMARY KEY (Personid)
+);
+```
+
+To let the `AUTO_INCREMENENT` sequence start with another value, use the following SQL statement:
+
+```sql
+ALTER TABLE Persons AUTO_INCREMENENT=100;
+```
+
+When we insert a new record into the "Persons" table, we do NOT have to specify a value for the "Personid" column (a unique value will be added automatically):
+
+```sql
+INSERT INTO Persons (FirstName, LastName)
+VALUES ('Lars', 'Monsen');
+```
+
+## :small_blue_diamond: MySQL DATES
+
+### MySQL Working With Dates
+
+The most difficult part when working with dates is to be sure that the format of the date you are trying to insert, matches the format of the date column in the database.
+
+As long as your data contains only the date portion, your queries will work as expected. However, if a time portion is involved, it gets more complicated.
+
+### MySQL Date Data Types
+
+MySQL comes with the following data types for storing a date or a date/time value in the database:
+
+- `DATE` - format YYYY-MM-DD
+- `DATETIME` - format YYYY-MM-DD HH:MI:SS
+- `TIMESTAMP` - format YYYY-MM-DD HH:MI:SS
+- `YEAR` - format YYYY or YY
+
+**NOTE**: The date data type are set for a column when you create a new table in your database!
+
+### Working with Dates
+
+Look at the following table:
+
+Orders Table
+
+| **OrderID** | **ProductName**         | **OrderDate** |
+|-------------|-------------------------|---------------|
+| 1           | Geitost                 | 2008-11-11    |
+| 2           | Camembert Pierrot       | 2008-11-09    |
+| 3           | Mozzarella di Giovanni  | 2008-11-11    |
+| 4           | Mascarpone Fabioli      | 2008-10-29    |
+
+Now we want to select the records with an OrderDate of "2008-11-11" from the table above.
+
+```sql
+SELECT * FROM Orders WHERE OrderDate='2008-11-11';
+```
+
+**NOTE**: Two dates can easily be compared if there is no time component involved!
+
+Now, assume that the "Orders" table look like this (notice the added time-component in the "OrderDate" column):
+
+| **OrderID** | **ProductName**         | **OrderDate**       |
+|-------------|-------------------------|---------------------|
+| 1           | Geitost                 | 2008-11-11 13:23:44 |
+| 2           | Camembert Pierrot       | 2008-11-09 15:45:21 |
+| 3           | Mozzarella di Giovanni  | 2008-11-11 11:12:01 |
+| 4           | Mascarpone Fabioli      | 2008-10-29 14:56:59 |
+
+If we use the same `SELECT` statement as above:
+
+```sql
+SELECT * FROM Orders WHERE OrderDate='2008-11-11';
+```
+
+We will get no result! This is because the query is looking only for dates with no time portion.
+
+**TIP**: To keep your queries simple and easy to maintain, do not use time-components in your dates, unless you have to!
+
+## :small_blue_diamond: MySQL VIEW
+
+### MySQL CREATE VIEW Statement
+
+In SQL, a view is a virtual table based on the result-set of an SQL statement.
+
+A view contains rows and columns, just like a real table. The fields in a view are fields from one or more real tables in the database.
+
+You can add SQL statements and functions to a view and present the data as if the data were coming from one single table.
+
+A view is created with the `CREATE VIEW` statement.
+
+**CREATE VIEW Syntax**
+
+```sql
+CREATE VIEW view_name AS SELECT column1, column2, ... FROM table_name WHERE condition;
+```
+
+**NOTE**: A view always shows up-to-date data! The database engine recreates the view, every time a user queries it.
+
+### MySQL CREATE VIEW Examples
+
+The following SQL creates a view that shows all customers from Brazil:
+
+```sql
+CREATE VIEW [Brazil Customers] AS SELECT CustomerName, ContactName FROM Customers WHERE Country='Brazil';
+```
+
+We can query the view above as follows:
+
+**Example**
+
+```sql
+SELECT * FROM [Brazil Customers];
+```
+
+The following SQL creates a view that selects every product in the "Products" table with a price higher than the average price:
+
+**Example**
+
+```sql
+CREATE VIEW [Products Above Average Price] AS SELECT ProductName, Price FROM Products WHERE Price > (SELECT AVG(Price) FROM Products);
+```
+
+We can query the view above as follows:
+
+**Example**
+
+```sql
+SELECT * FROM [Products Above Average Price];
+```
+
+### MySQL Updating a view
+
+A view can be updated with the `CREATE OR REPLACE VIEW` statement.
+
+**CREATE OR REPLACE VIEW Syntax**
+
+```sql
+CREATE OR REPLACE VIEW view_name AS
+SELECT column1, column2, ... FROM table_name
+WHERE condition;
+```
+
+The following SQL adds the "City" column to the "Brazil Customers" view:
+
+**Example**
+
+```sql
+CREATE OR REPLACE VIEW [Brazil Customers] AS
+SELECT CustomerName, ContactName, City  FROM Customers
+WHERE Country='Brazil';
+```
+
+### MySQL Dropping a view
+
+A view is deleted with the `DROP VIEW` statement.
+
+**DROP VIEW Syntax**
+
+```sql
+DROP VIEW view_name;
+```
+
+The following SQL drops the "Brazil Customers" view:
+
+```sql
+DROP VIEW [Brazil Customers];
+```
